@@ -1,0 +1,59 @@
+=== JMeter install + JMX validation ===
+2026-05-23T20:15:43+00:00
+downloading jmeter...
+curl: (56) Received HTTP code 403 from proxy after CONNECT
+download_rc=0
+trying maven central...
+trying https://repo1.maven.org/maven2/org/apache/jmeter/ApacheJMeter/5.6.3/ApacheJMeter-5.6.3.zip
+curl: (56) Received HTTP code 403 from proxy after CONNECT
+HTTP=000 size=0
+trying https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz
+curl: (56) Received HTTP code 403 from proxy after CONNECT
+HTTP=000 size=0
+trying https://www.apache.org/dyn/closer.lua/jmeter/binaries/apache-jmeter-5.6.3.tgz
+curl: (56) Received HTTP code 403 from proxy after CONNECT
+HTTP=000 size=0
+ls: cannot access 'jmeter.bin': No such file or directory
+
+=== Apache mirrors blocked by proxy. Falling back to XML syntax + structure validation. ===
+
+found 2 JMX plans
+
+--- OpenCart-Full.jmx ---
+size: 10225 bytes
+root tag: jmeterTestPlan
+jmeter version attr: 5.6.3
+  TestPlans          : 1
+  ThreadGroups       : 1
+  HTTPSamplerProxy   : 5
+  CookieManager      : 1
+  HeaderManager      : 1
+  HTTP Defaults      : 1
+  ResultCollector    : 1
+    sampler: "GET /" -> GET /
+    sampler: "GET category" -> GET /index.php
+    sampler: "GET product" -> GET /index.php
+    sampler: "GET search" -> GET /index.php
+    sampler: "POST cart.add" -> POST /index.php
+    thread-group: threads=${__P(threads,50)} ramp=${__P(rampup,60)} duration=${__P(duration,300)}
+  syntax: VALID
+
+--- OpenCart-Smoke.jmx ---
+size: 10167 bytes
+root tag: jmeterTestPlan
+jmeter version attr: 5.6.3
+  TestPlans          : 1
+  ThreadGroups       : 1
+  HTTPSamplerProxy   : 5
+  CookieManager      : 1
+  HeaderManager      : 1
+  HTTP Defaults      : 1
+  ResultCollector    : 1
+    sampler: "GET /" -> GET /
+    sampler: "GET category" -> GET /index.php
+    sampler: "GET product" -> GET /index.php
+    sampler: "GET search" -> GET /index.php
+    sampler: "POST cart.add" -> POST /index.php
+    thread-group: threads=${__P(threads,5)} ramp=${__P(rampup,5)} duration=${__P(duration,30)}
+  syntax: VALID
+rc=0

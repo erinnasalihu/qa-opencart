@@ -1,0 +1,5 @@
+{
+  "valid":   { "email": "qa.valid@test.local",  "password": "Pass@123" },
+  "locked":  { "email": "qa.locked@test.local", "password": "Pass@123" },
+  "admin":   { "username": "user", "password": "bitnami" }
+}

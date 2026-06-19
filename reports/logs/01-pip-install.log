@@ -1,0 +1,6 @@
+=== pip install (split) ===
+2026-05-23T20:13:26+00:00
+rc=0
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+AttributeError: module 'faker' has no attribute '__version__'

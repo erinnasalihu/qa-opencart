@@ -1,0 +1,34 @@
+{
+  "registration": {
+    "valid": {
+      "firstname": "Qa",
+      "lastname": "Tester",
+      "email": "qa.new+__RAND__@test.local",
+      "telephone": "+38344123456",
+      "password": "Pass@123"
+    },
+    "invalid_emails": [
+      "",
+      "qauser.test.local",
+      "qa@test",
+      "qa@@test.local",
+      " qa@test.local"
+    ],
+    "boundary_passwords": {
+      "below_min": "abc",
+      "at_min": "Pass@12",
+      "at_max": "PWxxxxxxxxxxxxxxxxxx@",
+      "above_max": "PWxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx@"
+    }
+  },
+  "search": {
+    "existing": "iPhone",
+    "missing": "nonexistentproductxyzzy123",
+    "xss": "<script>alert(1)</script>",
+    "sqli": "' OR 1=1 -- ",
+    "empty": ""
+  },
+  "cart": {
+    "quantities": [0, 1, 2, 999, 1000, 9999, -1, 2147483647]
+  }
+}

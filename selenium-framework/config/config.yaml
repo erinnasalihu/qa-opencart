@@ -1,0 +1,19 @@
+base_url: "http://localhost:8080"
+admin_path: "/administration"
+browser: "chrome"
+headless: true
+implicit_wait: 5
+explicit_wait: 15
+users:
+  valid:
+    email: "qa.valid@test.local"
+    password: "Pass@123"
+  locked:
+    email: "qa.locked@test.local"
+    password: "Pass@123"
+admin:
+  username: "user"
+  password: "bitnami"
+products:
+  in_stock: 42
+  out_of_stock: 99

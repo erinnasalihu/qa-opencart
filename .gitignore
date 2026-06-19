@@ -1,0 +1,24 @@
+# Node
+node_modules/
+
+# Cypress generated artifacts
+cypress-framework/cypress/reports/
+cypress-framework/cypress/videos/
+cypress-framework/cypress/screenshots/
+
+# Selenium / pytest reports
+selenium-framework/reports/
+
+# JMeter results
+jmeter/results/
+
+# Newman report
+newman-report.html
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# OS
+.DS_Store

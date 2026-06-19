@@ -1,0 +1,110 @@
+name: QA Pipeline
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  selenium:
+    name: Selenium / pytest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Boot OpenCart stack
+        working-directory: infra
+        run: |
+          docker compose up -d
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:8080/ > /dev/null; then break; fi
+            sleep 5
+          done
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Install Python deps
+        working-directory: selenium-framework
+        run: pip install -r requirements.txt
+      - name: Run pytest
+        working-directory: selenium-framework
+        env:
+          BROWSER: chrome
+          HEADLESS: "1"
+          BASE_URL: http://localhost:8080
+        run: pytest -n 2 --reruns 1 --html=reports/report.html --self-contained-html
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selenium-report
+          path: |
+            selenium-framework/reports/
+
+  cypress:
+    name: Cypress
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Boot OpenCart stack
+        working-directory: infra
+        run: |
+          docker compose up -d
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:8080/ > /dev/null; then break; fi
+            sleep 5
+          done
+      - uses: cypress-io/github-action@v6
+        with:
+          working-directory: cypress-framework
+          browser: chrome
+          record: false
+          config-file: cypress.config.js
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-report
+          path: |
+            cypress-framework/cypress/reports/
+            cypress-framework/cypress/screenshots/
+            cypress-framework/cypress/videos/
+
+  api:
+    name: API (Newman)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - run: npm install -g newman newman-reporter-htmlextra
+      - name: Boot stack
+        working-directory: infra
+        run: docker compose up -d && sleep 60
+      - run: |
+          newman run postman/opencart-api.postman_collection.json \
+                 -e postman/local.postman_environment.json \
+                 -r cli,htmlextra \
+                 --reporter-htmlextra-export newman-report.html
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: newman-report, path: newman-report.html }
+
+  jmeter-smoke:
+    name: JMeter smoke (5 users, 30s)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Boot stack
+        working-directory: infra
+        run: docker compose up -d && sleep 60
+      - name: Install JMeter
+        run: |
+          curl -sSLO https://dlcdn.apache.org/jmeter/binaries/apache-jmeter-5.6.3.tgz
+          tar xf apache-jmeter-5.6.3.tgz
+      - run: |
+          apache-jmeter-5.6.3/bin/jmeter -n -t jmeter/plans/OpenCart-Smoke.jmx \
+            -l jmeter/results/smoke.jtl -e -o jmeter/results/smoke-html
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jmeter-smoke
+          path: jmeter/results/

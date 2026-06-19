@@ -1,0 +1,246 @@
+=== Install Newman + run collection in dry-mode against unreachable local URL (expect connection refused — proves collection is well-formed) ===
+2026-05-23T20:14:54+00:00
+npm warn deprecated uuid@9.0.1: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
+npm warn deprecated uuid@3.4.0: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
+npm warn deprecated @faker-js/faker@5.5.3: Please update to a newer version.
+
+added 166 packages in 24s
+---
+6.2.1
+=== Newman validates the collection JSON & runs it against unreachable localhost ===
+newman
+
+OpenCart Legacy API (route=api/*)
+
+→ API-01 — Login (happy path)
+  POST http://localhost:8080/index.php?route=api/login [errored]
+     connect ECONNREFUSED 127.0.0.1:8080
+  2. status 200
+  3. api_token returned
+  4. response time < 1500 ms
+
+→ API-02 — Login (invalid key)
+  POST http://localhost:8080/index.php?route=api/login [errored]
+     connect ECONNREFUSED 127.0.0.1:8080
+  6. status 200 (controller wraps errors as 200)
+  7. error.key set
+
+→ API-03 — Login (missing username)
+  POST http://localhost:8080/index.php?route=api/login [errored]
+     connect ECONNREFUSED 127.0.0.1:8080
+  9. error.username set
+
+→ API-04 — Add to cart
+  POST http://localhost:8080/index.php?route=api/cart.add&api_token= [errored]
+     connect ECONNREFUSED 127.0.0.1:8080
+ 11. status 200
+  ┌
+  │ `Using "tv4" is deprecated. Use "require('ajv')" inste
+  │ ad.`
+  └
+ 12. schema valid
+
+→ API-05 — Cart products
+  GET http://localhost:8080/index.php?route=api/cart.products&api_token= [errored]
+     connect ECONNREFUSED 127.0.0.1:8080
+ 14. status 200
+ 15. products array present
+
+→ API-06 — Edit quantity (BVA 0)
+  POST http://localhost:8080/index.php?route=api/cart.edit&api_token= [errored]
+     connect ECONNREFUSED 127.0.0.1:8080
+ 17. status 200
+ 18. quantity=0 removes the line OR returns error
+
+→ API-07 — Shipping methods
+  GET http://localhost:8080/index.php?route=api/shipping.methods&api_token= [errored]
+     connect ECONNREFUSED 127.0.0.1:8080
+ 20. status 200
+
+→ API-08 — Payment methods
+  GET http://localhost:8080/index.php?route=api/payment.methods&api_token= [errored]
+     connect ECONNREFUSED 127.0.0.1:8080
+ 22. status 200
+
+→ API-09 — Create order
+  POST http://localhost:8080/index.php?route=api/order.add&api_token= [errored]
+     connect ECONNREFUSED 127.0.0.1:8080
+ 24. status 200
+ 25. order_id returned on success
+
+→ API-10 — Unauthorized call (post-logout)
+  GET http://localhost:8080/index.php?route=api/cart.products&api_token=00000000000000000000000000000000 [errored]
+     connect ECONNREFUSED 127.0.0.1:8080
+ 27. status 200 (controller wraps errors as 200)
+ 28. returns error.api_token
+
+┌─────────────────────────┬──────────┬──────────┐
+│                         │ executed │   failed │
+├─────────────────────────┼──────────┼──────────┤
+│              iterations │        1 │        0 │
+├─────────────────────────┼──────────┼──────────┤
+│                requests │       10 │       10 │
+├─────────────────────────┼──────────┼──────────┤
+│            test-scripts │       10 │        0 │
+├─────────────────────────┼──────────┼──────────┤
+│      prerequest-scripts │        0 │        0 │
+├─────────────────────────┼──────────┼──────────┤
+│              assertions │       18 │       18 │
+├─────────────────────────┴──────────┴──────────┤
+│ total run duration: 149ms                     │
+├───────────────────────────────────────────────┤
+│ total data received: 0B (approx)              │
+└───────────────────────────────────────────────┘
+
+   #  failure         detail                                                   
+                                                                               
+ 01.  Error                                                                    
+                      connect ECONNREFUSED 127.0.0.1:8080                      
+                      at request                                               
+                      inside ""                                                
+                                                                               
+ 02.  AssertionError  status 200                                               
+                      expected PostmanResponse{ …(5) } to have property 'code' 
+                      at assertion:0 in test-script                            
+                      inside "API-01 — Login (happy path)"                     
+                                                                               
+ 03.  JSONError       api_token returned                                       
+                      "undefined" is not valid JSON                            
+                      at assertion:1 in test-script                            
+                      inside "API-01 — Login (happy path)"                     
+                                                                               
+ 04.  AssertionError  response time < 1500 ms                                  
+                      expected undefined to be a number or a date              
+                      at assertion:2 in test-script                            
+                      inside "API-01 — Login (happy path)"                     
+                                                                               
+ 05.  Error                                                                    
+                      connect ECONNREFUSED 127.0.0.1:8080                      
+                      at request                                               
+                      inside ""                                                
+                                                                               
+ 06.  AssertionError  status 200 (controller wraps errors as 200)              
+                      expected PostmanResponse{ …(5) } to have property 'code' 
+                      at assertion:0 in test-script                            
+                      inside "API-02 — Login (invalid key)"                    
+                                                                               
+ 07.  JSONError       error.key set                                            
+                      "undefined" is not valid JSON                            
+                      at assertion:1 in test-script                            
+                      inside "API-02 — Login (invalid key)"                    
+                                                                               
+ 08.  Error                                                                    
+                      connect ECONNREFUSED 127.0.0.1:8080                      
+                      at request                                               
+                      inside ""                                                
+                                                                               
+ 09.  JSONError       error.username set                                       
+                      "undefined" is not valid JSON                            
+                      at assertion:0 in test-script                            
+                      inside "API-03 — Login (missing username)"               
+                                                                               
+ 10.  Error                                                                    
+                      connect ECONNREFUSED 127.0.0.1:8080                      
+                      at request                                               
+                      inside ""                                                
+                                                                               
+ 11.  AssertionError  status 200                                               
+                      expected PostmanResponse{ …(5) } to have property 'code' 
+                      at assertion:0 in test-script                            
+                      inside "API-04 — Add to cart"                            
+                                                                               
+ 12.  JSONError       schema valid                                             
+                      "undefined" is not valid JSON                            
+                      at assertion:1 in test-script                            
+                      inside "API-04 — Add to cart"                            
+                                                                               
+ 13.  Error                                                                    
+                      connect ECONNREFUSED 127.0.0.1:8080                      
+                      at request                                               
+                      inside ""                                                
+                                                                               
+ 14.  AssertionError  status 200                                               
+                      expected PostmanResponse{ …(5) } to have property 'code' 
+                      at assertion:0 in test-script                            
+                      inside "API-05 — Cart products"                          
+                                                                               
+ 15.  JSONError       products array present                                   
+                      "undefined" is not valid JSON                            
+                      at assertion:1 in test-script                            
+                      inside "API-05 — Cart products"                          
+                                                                               
+ 16.  Error                                                                    
+                      connect ECONNREFUSED 127.0.0.1:8080                      
+                      at request                                               
+                      inside ""                                                
+                                                                               
+ 17.  AssertionError  status 200                                               
+                      expected PostmanResponse{ …(5) } to have property 'code' 
+                      at assertion:0 in test-script                            
+                      inside "API-06 — Edit quantity (BVA 0)"                  
+                                                                               
+ 18.  JSONError       quantity=0 removes the line OR returns error             
+                      "undefined" is not valid JSON                            
+                      at assertion:1 in test-script                            
+                      inside "API-06 — Edit quantity (BVA 0)"                  
+                                                                               
+ 19.  Error                                                                    
+                      connect ECONNREFUSED 127.0.0.1:8080                      
+                      at request                                               
+                      inside ""                                                
+                                                                               
+ 20.  AssertionError  status 200                                               
+                      expected PostmanResponse{ …(5) } to have property 'code' 
+                      at assertion:0 in test-script                            
+                      inside "API-07 — Shipping methods"                       
+                                                                               
+ 21.  Error                                                                    
+                      connect ECONNREFUSED 127.0.0.1:8080                      
+                      at request                                               
+                      inside ""                                                
+                                                                               
+ 22.  AssertionError  status 200                                               
+                      expected PostmanResponse{ …(5) } to have property 'code' 
+                      at assertion:0 in test-script                            
+                      inside "API-08 — Payment methods"                        
+                                                                               
+ 23.  Error                                                                    
+                      connect ECONNREFUSED 127.0.0.1:8080                      
+                      at request                                               
+                      inside ""                                                
+                                                                               
+ 24.  AssertionError  status 200                                               
+                      expected PostmanResponse{ …(5) } to have property 'code' 
+                      at assertion:0 in test-script                            
+                      inside "API-09 — Create order"                           
+                                                                               
+ 25.  JSONError       order_id returned on success                             
+                      "undefined" is not valid JSON                            
+                      at assertion:1 in test-script                            
+                      inside "API-09 — Create order"                           
+                                                                               
+ 26.  Error                                                                    
+                      connect ECONNREFUSED 127.0.0.1:8080                      
+                      at request                                               
+                      inside ""                                                
+                                                                               
+ 27.  AssertionError  status 200 (controller wraps errors as 200)              
+                      expected PostmanResponse{ …(5) } to have property 'code' 
+                      at assertion:0 in test-script                            
+                      inside "API-10 — Unauthorized call (post-logout)"        
+                                                                               
+ 28.  JSONError       returns error.api_token                                  
+                      "undefined" is not valid JSON                            
+                      at assertion:1 in test-script                            
+                      inside "API-10 — Unauthorized call (post-logout)"        
+newman_exit=0
+iterations: {'total': 1, 'pending': 0, 'failed': 0}
+requests  : {'total': 10, 'pending': 0, 'failed': 10}
+tests     : {'total': 10, 'pending': 0, 'failed': 0}
+assertions: {'total': 18, 'pending': 0, 'failed': 18}
+
+failures: 28
+executions: 10
+  - API-01 — Login (happy path): response=no | err=None
+  - API-02 — Login (invalid key): response=no | err=None
+  - API-03 — Login (missing username): response=no | err=None

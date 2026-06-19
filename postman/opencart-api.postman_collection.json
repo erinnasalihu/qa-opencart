@@ -1,0 +1,190 @@
+{
+  "info": {
+    "_postman_id": "9c1f5b2a-0001-4001-9001-opencart-qa-suite",
+    "name": "OpenCart Legacy API (route=api/*)",
+    "description": "QA suite against OpenCart 4.1.x legacy storefront API. The API ships under index.php?route=api/<controller>[.method]; form-urlencoded inputs; api_token returned by api/login flows as a query-string parameter on every subsequent call.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "api_token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "API-01 — Login (happy path)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "pm.test('api_token returned', () => {",
+              "  const j = pm.response.json();",
+              "  pm.expect(j).to.have.property('api_token').that.is.a('string').and.has.lengthOf(32);",
+              "  pm.collectionVariables.set('api_token', j.api_token);",
+              "});",
+              "pm.test('response time < 1500 ms', () => pm.expect(pm.response.responseTime).to.be.below(1500));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            { "key": "username", "value": "{{api_username}}" },
+            { "key": "key",      "value": "{{api_key}}" }
+          ]
+        },
+        "url": { "raw": "{{base_url}}/index.php?route=api/login", "host": ["{{base_url}}"], "path": ["index.php"], "query": [{ "key": "route", "value": "api/login" }] }
+      }
+    },
+    {
+      "name": "API-02 — Login (invalid key)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200 (controller wraps errors as 200)', () => pm.response.to.have.status(200));",
+              "pm.test('error.key set', () => pm.expect(pm.response.json().error).to.have.property('key'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "body": { "mode": "urlencoded", "urlencoded": [
+          { "key": "username", "value": "{{api_username}}" },
+          { "key": "key",      "value": "INVALID_KEY_XYZ" }
+        ]},
+        "url": { "raw": "{{base_url}}/index.php?route=api/login", "host": ["{{base_url}}"], "path": ["index.php"], "query": [{ "key": "route", "value": "api/login" }] }
+      }
+    },
+    {
+      "name": "API-03 — Login (missing username)",
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('error.username set', () => pm.expect(pm.response.json().error).to.have.property('username'));"
+      ], "type": "text/javascript" }}],
+      "request": {
+        "method": "POST",
+        "body": { "mode": "urlencoded", "urlencoded": [{ "key": "key", "value": "{{api_key}}" }] },
+        "url": { "raw": "{{base_url}}/index.php?route=api/login", "host": ["{{base_url}}"], "path": ["index.php"], "query": [{ "key": "route", "value": "api/login" }] }
+      }
+    },
+    {
+      "name": "API-04 — Add to cart",
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('status 200', () => pm.response.to.have.status(200));",
+        "const schema = { type: 'object', properties: { success: { type: 'string' }, error: { type: 'object' } } };",
+        "pm.test('schema valid', () => pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true);"
+      ], "type": "text/javascript" }}],
+      "request": {
+        "method": "POST",
+        "body": { "mode": "urlencoded", "urlencoded": [
+          { "key": "product_id", "value": "42" },
+          { "key": "quantity",   "value": "1" }
+        ]},
+        "url": { "raw": "{{base_url}}/index.php?route=api/cart.add&api_token={{api_token}}", "host": ["{{base_url}}"], "path": ["index.php"], "query": [
+          { "key": "route", "value": "api/cart.add" },
+          { "key": "api_token", "value": "{{api_token}}" }
+        ]}
+      }
+    },
+    {
+      "name": "API-05 — Cart products",
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('status 200', () => pm.response.to.have.status(200));",
+        "pm.test('products array present', () => pm.expect(pm.response.json()).to.have.property('products'));"
+      ], "type": "text/javascript" }}],
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{base_url}}/index.php?route=api/cart.products&api_token={{api_token}}", "host": ["{{base_url}}"], "path": ["index.php"], "query": [
+          { "key": "route", "value": "api/cart.products" },
+          { "key": "api_token", "value": "{{api_token}}" }
+        ]}
+      }
+    },
+    {
+      "name": "API-06 — Edit quantity (BVA 0)",
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('status 200', () => pm.response.to.have.status(200));",
+        "pm.test('quantity=0 removes the line OR returns error', () => {",
+        "  const j = pm.response.json();",
+        "  pm.expect(j).to.satisfy(o => o.success || (o.error && Object.keys(o.error).length));",
+        "});"
+      ], "type": "text/javascript" }}],
+      "request": {
+        "method": "POST",
+        "body": { "mode": "urlencoded", "urlencoded": [
+          { "key": "key", "value": "1" },
+          { "key": "quantity", "value": "0" }
+        ]},
+        "url": { "raw": "{{base_url}}/index.php?route=api/cart.edit&api_token={{api_token}}", "host": ["{{base_url}}"], "path": ["index.php"], "query": [
+          { "key": "route", "value": "api/cart.edit" },
+          { "key": "api_token", "value": "{{api_token}}" }
+        ]}
+      }
+    },
+    {
+      "name": "API-07 — Shipping methods",
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('status 200', () => pm.response.to.have.status(200));"
+      ], "type": "text/javascript" }}],
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{base_url}}/index.php?route=api/shipping.methods&api_token={{api_token}}", "host": ["{{base_url}}"], "path": ["index.php"], "query": [
+          { "key": "route", "value": "api/shipping.methods" },
+          { "key": "api_token", "value": "{{api_token}}" }
+        ]}
+      }
+    },
+    {
+      "name": "API-08 — Payment methods",
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('status 200', () => pm.response.to.have.status(200));"
+      ], "type": "text/javascript" }}],
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{base_url}}/index.php?route=api/payment.methods&api_token={{api_token}}", "host": ["{{base_url}}"], "path": ["index.php"], "query": [
+          { "key": "route", "value": "api/payment.methods" },
+          { "key": "api_token", "value": "{{api_token}}" }
+        ]}
+      }
+    },
+    {
+      "name": "API-09 — Create order",
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('status 200', () => pm.response.to.have.status(200));",
+        "pm.test('order_id returned on success', () => {",
+        "  const j = pm.response.json();",
+        "  if (j.success) pm.expect(j).to.have.property('order_id');",
+        "});"
+      ], "type": "text/javascript" }}],
+      "request": {
+        "method": "POST",
+        "url": { "raw": "{{base_url}}/index.php?route=api/order.add&api_token={{api_token}}", "host": ["{{base_url}}"], "path": ["index.php"], "query": [
+          { "key": "route", "value": "api/order.add" },
+          { "key": "api_token", "value": "{{api_token}}" }
+        ]}
+      }
+    },
+    {
+      "name": "API-10 — Unauthorized call (post-logout)",
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('status 200 (controller wraps errors as 200)', () => pm.response.to.have.status(200));",
+        "pm.test('returns error.api_token', () => pm.expect(pm.response.json().error || {}).to.have.property('api_token'));"
+      ], "type": "text/javascript" }}],
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{base_url}}/index.php?route=api/cart.products&api_token=00000000000000000000000000000000", "host": ["{{base_url}}"], "path": ["index.php"], "query": [
+          { "key": "route", "value": "api/cart.products" },
+          { "key": "api_token", "value": "00000000000000000000000000000000" }
+        ]}
+      }
+    }
+  ]
+}

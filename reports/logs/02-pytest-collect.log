@@ -1,0 +1,20 @@
+=== pytest --collect-only (no HTML, isolated tmp) ===
+2026-05-23T20:13:55+00:00
+tests/test_add_to_cart.py::test_add_product_to_cart
+tests/test_admin_login.py::test_admin_valid_login
+tests/test_checkout_navigation.py::test_checkout_redirect_when_anonymous
+tests/test_login_invalid.py::test_invalid_login[qa.valid@test.local-wrong-pw-wrong-password]
+tests/test_login_invalid.py::test_invalid_login[no.such.user@test.local-Pass@123-unknown-email]
+tests/test_login_invalid.py::test_invalid_login[--empty]
+tests/test_login_invalid.py::test_invalid_login[not-an-email-Pass@123-malformed]
+tests/test_login_valid.py::test_valid_login
+tests/test_logout.py::test_logout
+tests/test_registration.py::test_register_new_customer
+tests/test_remove_from_cart.py::test_remove_from_cart
+tests/test_search.py::test_search_returns_results
+tests/test_search.py::test_search_no_results
+tests/test_search.py::test_search_xss_payload_is_escaped
+tests/test_wishlist.py::test_wishlist_requires_login
+
+15 tests collected in 0.03s
+rc=0

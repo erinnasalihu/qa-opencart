@@ -1,0 +1,21 @@
+=== Cypress: list specs via the bundled bin (no run; no browser available) ===
+2026-05-23T20:16:23+00:00
+specs found: 10
+  - add_to_cart.cy.js | describe: 1 | it: 2
+  - cart_validation.cy.js | describe: 1 | it: 2
+  - checkout.cy.js | describe: 1 | it: 1
+  - login_invalid.cy.js | describe: 1 | it: 1
+  - login_valid.cy.js | describe: 1 | it: 1
+  - logout.cy.js | describe: 1 | it: 1
+  - navigation.cy.js | describe: 1 | it: 1
+  - remove_from_cart.cy.js | describe: 1 | it: 1
+  - search.cy.js | describe: 1 | it: 3
+  - wishlist.cy.js | describe: 1 | it: 1
+---
+=== cypress.config.js parse check ===
+viewport: 1366x768
+retries: {"runMode":2,"openMode":0}
+baseUrl: http://localhost:8080
+reporter: cypress-mochawesome-reporter
+env keys: [ 'customer', 'admin', 'adminPath', 'products' ]
+rc=0

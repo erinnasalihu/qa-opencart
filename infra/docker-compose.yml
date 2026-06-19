@@ -1,0 +1,54 @@
+services:
+  mariadb:
+    image: mariadb:11
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: opencart
+      MARIADB_USER: opencart
+      MARIADB_PASSWORD: opencart
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+  opencart:
+    image: php:8.2-apache
+    platform: linux/arm64
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    volumes:
+      - ../opencart-source/upload:/var/www/html
+    command: >
+      bash -lc "
+      apt-get update &&
+      apt-get install -y unzip git libzip-dev libpng-dev libjpeg-dev libfreetype6-dev libonig-dev &&
+      docker-php-ext-configure gd --with-freetype --with-jpeg &&
+      docker-php-ext-install mysqli pdo pdo_mysql zip gd mbstring &&
+      chown -R www-data:www-data /var/www/html &&
+      apache2-foreground
+      "
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    depends_on:
+      - mariadb
+    environment:
+      PMA_HOST: mariadb
+    ports:
+      - "8888:80"
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    platform: linux/amd64
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
+volumes:
+  mariadb_data:

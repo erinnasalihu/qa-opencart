@@ -1,0 +1,4 @@
+{
+  "inStock":    { "id": 42, "name": "iPhone" },
+  "outOfStock": { "id": 99, "name": "Unavailable Demo Product" }
+}

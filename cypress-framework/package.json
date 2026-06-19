@@ -1,0 +1,19 @@
+{
+  "name": "opencart-cypress-framework",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cypress E2E test suite for OpenCart 4.1.x (storefront + admin)",
+  "scripts": {
+    "cy:open": "cypress open",
+    "cy:run":  "cypress run",
+    "cy:smoke": "cypress run --spec 'cypress/e2e/login_valid.cy.js,cypress/e2e/add_to_cart.cy.js'",
+    "report:merge": "mochawesome-merge cypress/reports/json/*.json > cypress/reports/merged.json && marge cypress/reports/merged.json -o cypress/reports/html"
+  },
+  "devDependencies": {
+    "cypress": "13.13.0",
+    "cypress-mochawesome-reporter": "3.8.2",
+    "mochawesome": "7.1.3",
+    "mochawesome-merge": "4.3.0",
+    "mochawesome-report-generator": "6.2.0"
+  }
+}
